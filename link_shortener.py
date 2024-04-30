@@ -13,13 +13,11 @@ class LinkShortener:
         raise Exception("Your ID is not found")
 
     def shorten(self, url: str):
-        id_exists=self.url_exists(url) 
-        if id_exists:
-            return id_exists
-        unique_id=None
-        while not self.id_exists(unique_id):
-            print(self.id_exists(unique_id))
-            unique_id = str(uuid.uuid4())[:8]
+        # creates a list with the ids
+        ids = [entity["id"] for entity in self.url_entities]
+        unique_id = generate_id()
+        while not is_unique(unique_id,ids):
+            unique_id = generate_id()
         new_url_entity = {"id": unique_id, "url": url}
         self.url_entities.append(new_url_entity)
         JsonManager.write(self.url_entities)
@@ -31,14 +29,12 @@ class LinkShortener:
                 return url_entity["id"]
         return None
     
+def generate_id():
+    return str(uuid.uuid4())[:8]
     
-    def id_exists(self,id: str):
-        if not id:
-            return False
-        for url_entity in self.url_entities:
-            if url_entity["id"] == id:
-                return False
-        return True
+    
+def is_unique(self,id: str,list_ids:list):
+        return id not in list_ids
         
         
 
